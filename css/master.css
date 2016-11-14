@@ -1,9 +1,10 @@
 /* Pixellated font */
-@import url('https://fonts.googleapis.com/css?family=Press+Start+2P');
+@import url('https://fonts.googleapis.com/css?family=VT323');
 
 body {
   max-width: 100%;
-  font-family: 'Press Start 2P', cursive, sans-serif;
+  font-family: 'VT323', cursive, sans-serif;
+  font-size: 1.5em;
   background: green;
 }
 
@@ -83,4 +84,8 @@ img {
 
 .channel-content {
   width: 40%;
+}
+
+.offline {
+  color: rgb(94, 94, 94)
 }
