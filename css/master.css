@@ -2,7 +2,6 @@ body {
   font-family: sans-serif;
 }
 
-
 /*********************
 * Navbar styling
 ********************/
@@ -39,4 +38,31 @@ li.active {
 a, a:visited {
   color: white;
   text-decoration: none;
+}
+
+/*******************
+* Channel viewer styling
+*******************/
+
+
+.channel-list-item {
+  border: 2px solid white;
+  border-radius: 10px;
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  color: white;
+  background-color: rgb(0, 0, 178);
+}
+
+.channel-icon {
+  width: 20%;
+}
+
+.channel-name {
+  width: 40%;
+}
+
+.channel-content {
+  width: 40%;
 }
