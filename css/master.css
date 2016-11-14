@@ -1,5 +1,10 @@
+/* Pixellated font */
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P');
+
 body {
-  font-family: sans-serif;
+  max-width: 100%;
+  font-family: 'Press Start 2P', cursive, sans-serif;
+  background: green;
 }
 
 /*********************
@@ -46,17 +51,30 @@ a, a:visited {
 
 
 .channel-list-item {
-  border: 2px solid white;
+  border: 3px solid white;
   border-radius: 10px;
-  width: 100%;
   display: flex;
   flex-flow: row wrap;
   color: white;
-  background-color: rgb(0, 0, 178);
+  padding: 10px;
+  margin: 10px;
+  background: rgb(0, 0, 178);
+  background: -webkit-linear-gradient(top left, rgb(0, 0, 176), rgb(0, 0, 32));
+  background: -o-linear-gradient(top left, rgb(0, 0, 176), rgb(0, 0, 32));
+  background: moz-linear-gradient(top left, rgb(0, 0, 176), rgb(0, 0, 32));
+  background: linear-gradient(to bottom right, rgb(0, 0, 176), rgb(0, 0, 32));
+
 }
 
 .channel-icon {
   width: 20%;
+}
+img {
+  margin: auto;
+  width: 80%;
+  height: 80%;
+  max-width: 80px;
+  max-height: 80px;
 }
 
 .channel-name {
