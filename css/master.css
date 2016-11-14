@@ -1,0 +1,42 @@
+body {
+  font-family: sans-serif;
+}
+
+
+/*********************
+* Navbar styling
+********************/
+ul.navbar  {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+
+li.navitem {
+  float: left;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  border-right: 1px solid #bbb;
+}
+
+li.navitem:last-child {
+  border-right: none;
+}
+
+li:hover {
+  background-color: #111;
+}
+
+li.active {
+  background-color: #4caf50;
+}
+
+a, a:visited {
+  color: white;
+  text-decoration: none;
+}
