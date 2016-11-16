@@ -2,11 +2,20 @@
  * Hardcoded stuff for testing purposes
  **************************************************/
 
+
+
 /**************************************************
  * API Call to populate channel list
  **************************************************/
-
-
+var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/users/freecodecamp?callback=?';
+function httpGet(url) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', baseURL, true);
+  xhr.withCredentials = true;
+  xhr.send(null);
+  console.log(xhr.responseText);
+}
+httpGet(baseURL);
 
 
 
@@ -15,11 +24,12 @@
   **************************************************/
 // TODO Remove auto-executing brackets
 // TODO Should take channel info as input, right?
-(function addChannelToDom(iconLocation, channelName, streamName) {
+function addChannelToDom(iconLocation, channelName, streamName) {
   // Create outer div first
   // TODO: distinguish offline / online channels.
 
-  var outerEl = buildElement('div', 'channel-list-item online');
+  var channelStatus = streamName.length > 0 ? 'online' : 'offline';
+  var outerEl = buildElement('div', 'channel-list-item ' + channelStatus);
 
   // Append child elements to outer div
   var innerEl = buildElement('div', 'channel-icon');
@@ -38,7 +48,6 @@
   // Finally append outer div to DOM
   document.getElementById('channel-list-viewer').appendChild(outerEl);
 }
-)('https://static-cdn.jtvnw.net/jtv_user_pictures/livelogo-profile_image-c4a978b3811384fa-300x300.png', 'TheMounTing', 'Let\'s play Xenoblade!');
 
 
 /**************************************************
