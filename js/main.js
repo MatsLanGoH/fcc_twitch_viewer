@@ -6,17 +6,74 @@
 
 /**************************************************
  * API Call to populate channel list
- **************************************************/
-var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/users/freecodecamp?callback=?';
-function httpGet(url) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', baseURL, true);
-  xhr.withCredentials = true;
-  xhr.send(null);
-  console.log(xhr.responseText);
-}
-httpGet(baseURL);
+ *************************************************/
+ // Note: Using JSONP to override CORS (Cross Origin Resource Sharing)
+ // that occurs with an XHR(ajax) request.
 
+var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
+var userString = 'users/freecodecamp';
+
+// This function processes the response from the server
+function processJSONPresponse(data) {
+  // var responseData = data;
+  console.log(data);
+
+  addChannelToDom(data.logo, data.name, 'null');
+
+}
+
+function JSONP(url) {
+  var script = document.createElement('script');
+  script.src = url + '?callback=processJSONPresponse'; // TODO: Build correct string for GET query.
+  script.async = true;
+
+  document.getElementsByTagName('head')[0].appendChild(script);
+
+}
+
+JSONP(baseURL + userString);
+
+/* Usage:
+*
+* JSONP( 'someUrl.php?param1=value1', function(data) {
+*   //do something with data, which is the JSON object retrieved from someUrl.php
+* });
+var JSONP = (function(){
+    'use strict';
+    var counter = 0;
+
+    var memoryleakcap = function() {
+        if (this.readyState && this.readyState !== "loaded" && this.readyState !== "complete") { return; }
+
+        try {
+            this.onload = this.onreadystatechange = null;
+            this.parentNode.removeChild(this);
+        } catch(ignore) {}
+    };
+
+    return function(url, callback) {
+        var uniqueName = 'callback_json' + (++counter);
+
+        var script = document.createElement('script');
+        script.src = url + (url.toString().indexOf('?') === -1 ? '?' : '&') + 'callback=' + uniqueName;
+        script.async = true;
+
+        window[ uniqueName ] = function(data){
+            callback(data);
+            window[ uniqueName ] = null;
+            try { delete window[ uniqueName ]; } catch (ignore) {}
+        };
+
+        script.onload = script.onreadystatechange = memoryleakcap;
+
+        document.getElementsByTagName('head')[0].appendChild( script );
+
+        return uniqueName;
+    };
+}());
+
+// JSONP(baseURL, function(data){console.log(data)});
+*/
 
 
  /**************************************************
