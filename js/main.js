@@ -1,26 +1,114 @@
 /**************************************************
  * Hardcoded stuff for testing purposes
  **************************************************/
+var twitchUsers = ["brunofin", "ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
+var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
+var userString = 'users/';
+// userString = 'streams/';
+
+populateChannels(twitchUsers);
+
+/*
+2 Ways to do this
+1st.
+For each element, create the row first with id=username;
+Then create icon/name/description divs.
+Make first query for icon and username; attach the values to the
+corresponding divs.
+Make second query to determine channel and status;
+attach channel to div, and set class of row div to offline/online accordingly.
+
+
+
+2nd.
+Create objects for each user containing
+name, iconLocation, channel name and status.
+Make first query to get icon and username and attach the values to the
+corresponding object.
+Make second query to determine channel and status;
+attach values to corresponding object.
+Create a nested div (row > (icon > iconSrc | name > nameLink | stream > streamLink)),
+set class of row div according to state.
+
+*/
+
+function populateChannels(userList) {
+    // TODO: Clear all existing channels from DOM first?
+    // Just in case this is reused for the search function.
+    // Or SRP: have a clearChannels function handy.
+    userList.forEach(function(user) {
+
+      // Make first query.
+      var data = JSONP(baseURL + 'users/' + user);
+
+    });
+}
+
+
+function createViewerItem(username, iconSrc, channelStatus, content) {
+  var user = username || 'null',
+      iconSrc  = iconSrc  || '/not/found', // TODO please implement generic not found
+      channelStatus = channelStatus ? 'online' : 'offline',
+      contentDescription = content || 'Offline...';
+
+  // Create row.
+  var rowDiv = document.createElement('div');
+  rowDiv.setAttribute('id', user);
+
+  // Create sub divs.
+  var divNodes = [];
+  var subDivs = ['icon', 'name', 'content'];
+  subDivs.forEach(function(el) {
+    subDiv = document.createElement('div');
+    subDiv.setAttribute('class', 'channel-'+el);
+    // subDiv.appendChild(document.createTextNode(el));
+    divNodes.push(subDiv);
+    rowDiv.appendChild(subDiv);
+  })
+
+  // Attach values to divs.
+  var iconInner = document.createElement('img');
+  iconInner.setAttribute('src', iconSrc);
+  iconInner.setAttribute('alt', user);
+  divNodes[0].appendChild(iconInner);
+
+  var nameInner = document.createElement('a');
+  nameInner.setAttribute('href', 'https://www.twitch.tv/' + user);
+  nameInner.appendChild(document.createTextNode(user));
+  divNodes[1].appendChild(nameInner);
+
+  var contentInner = document.createTextNode(contentDescription);
+  divNodes[2].appendChild(contentInner);
+
+  // Make second query.
+  // Attach values to divs.
+  // Set class of row div.
+  rowDiv.setAttribute('class', 'channel-list-item ' + channelStatus);
+
+
+  // Finally, attach row to DOM.
+  document.getElementById('channel-list-viewer').appendChild(rowDiv);
+}
 
 
 
 /**************************************************
  * API Call to populate channel list
  *************************************************/
- // Note: Using JSONP to override CORS (Cross Origin Resource Sharing)
- // that occurs with an XHR(ajax) request.
-
-var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
-var userString = 'users/freecodecamp';
-
 // This function processes the response from the server
 function processJSONPresponse(data) {
   // var responseData = data;
   console.log(data);
+  createViewerItem(data.display_name, data.logo);
+
+  return data;
+  // Add Data results to DOM
 
   addChannelToDom(data.logo, data.name, 'null');
-
 }
+
+// Note: Using JSONP to override CORS (Cross Origin Resource Sharing)
+// that occurs with an XHR(ajax) request.
 
 function JSONP(url) {
   var script = document.createElement('script');
@@ -28,10 +116,9 @@ function JSONP(url) {
   script.async = true;
 
   document.getElementsByTagName('head')[0].appendChild(script);
-
+  document.getElementsByTagName('head')[0].removeChild(script);
 }
 
-JSONP(baseURL + userString);
 
 /* Usage:
 *
@@ -84,7 +171,6 @@ var JSONP = (function(){
 function addChannelToDom(iconLocation, channelName, streamName) {
   // Create outer div first
   // TODO: distinguish offline / online channels.
-
   var channelStatus = streamName.length > 0 ? 'online' : 'offline';
   var outerEl = buildElement('div', 'channel-list-item ' + channelStatus);
 
