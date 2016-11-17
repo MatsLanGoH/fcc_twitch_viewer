@@ -90,6 +90,10 @@ img {
   color: rgb(94, 94, 94)
 }
 
+a; a.dead {
+  color: rgb(217, 23, 23)
+}
+
 .hide {
   display: none;
 }

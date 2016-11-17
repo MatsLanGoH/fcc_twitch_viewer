@@ -1,7 +1,7 @@
 /**************************************************
  * Hardcoded stuff for testing purposes
  **************************************************/
-var twitchUsers = ["brunofin", "ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
+var twitchUsers = ["brunofin", "ESL_SC2", "freecodecamp"]; // ""OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
 var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
 var userString = 'users/';
 // userString = 'streams/';
@@ -41,10 +41,15 @@ function populateChannels(userList) {
       // Make first query.
       var data = JSONP(baseURL + 'users/' + user);
 
+      // Make second query.
+      var data2 = JSONP(baseURL + 'streams/' + user);
     });
 }
 
 
+/*********
+* Creates row for a stream
+*********/
 function createViewerItem(username, iconSrc, channelStatus, content) {
   var user = username || 'null',
       iconSrc  = iconSrc  || '/not/found', // TODO please implement generic not found
@@ -91,6 +96,27 @@ function createViewerItem(username, iconSrc, channelStatus, content) {
 }
 
 
+/*********
+* Updates row for a stream
+*********/
+function updateViewerItem(stream, id) {
+  var stream = stream || null,
+      id = id || 'ESL_SC2';
+  var item = document.getElementById(id);
+  // TODO : This doesn't work! Race conditions?
+  item.lastChild.appendChild(document.createTextNode(stream.channel.status));
+  item.setAttribute('class', 'channel-list-item online');
+}
+
+/*********
+* Updates row for a dead stream
+*********/
+function updateDeadItem(id) {
+  var id = id || 'brunofin';
+  var item = document.getElementById(id);
+
+}
+
 
 /**************************************************
  * API Call to populate channel list
@@ -98,8 +124,17 @@ function createViewerItem(username, iconSrc, channelStatus, content) {
 // This function processes the response from the server
 function processJSONPresponse(data) {
   // var responseData = data;
-  console.log(data);
-  createViewerItem(data.display_name, data.logo);
+
+  // If we have a display_name create the item
+  if (data.display_name) {
+    createViewerItem(data.display_name, data.logo);
+  } else if (data.error) {
+    // console.log(data);
+    updateDeadItem();
+  } else if (data.stream == null || data.stream) {
+    console.log(data.stream);
+    updateViewerItem(data.stream);
+  }
 
   return data;
   // Add Data results to DOM
