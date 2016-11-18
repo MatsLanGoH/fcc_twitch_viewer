@@ -9,9 +9,9 @@ populateChannels(twitchUsers);
 
 function populateChannels(userList) {
     userList.forEach(function(user) {
-      JSONP(baseURL + 'streams/' + user);
+      JSONP(baseURL + 'streams/' + user, 'processJSONPresponse');
     });
-}
+  }
 
 
 /*********
@@ -19,7 +19,7 @@ function populateChannels(userList) {
 *********/
 function createViewerItem(username, iconSrc, channelStatus, content) {
   var user = username || 'null',
-      iconSrc = iconSrc  || '/img/missing.png',
+      iconSrc = iconSrc  || 'img/missing.png',
       channelStatus = channelStatus || 'offline',
       contentDescription = content || 'Offline...';
 
@@ -70,7 +70,7 @@ function processJSONPresponse(data) {
   // This attribute is contained in a /USERS/:USER response.
   if (data.display_name) {
     createViewerItem(data.display_name, data.logo, 'offline', data.bio);
-    console.log(data);
+    // console.log(data);
 
   // This is received after a /STREAMS response for closed accounts.
   } else if (data.error) {
@@ -88,7 +88,7 @@ function processJSONPresponse(data) {
     var userName = re.exec(data._links.channel);
     // TODO: We still need the user icon, though. Ideas?
     // createViewerItem(userName, null, 'offline', 'Offline...');
-    JSONP(baseURL + 'users/' + userName);
+    JSONP(baseURL + 'users/' + userName, 'processJSONPresponse');
 
   // This is the response for users with an active account,
   // who are currently streaming something.
@@ -106,9 +106,9 @@ function processJSONPresponse(data) {
 /**********************************
  * Place a JSONP request with callback
  ********************************/
-function JSONP(url, args='') {
+function JSONP(url, callback, args='') {
   var script = document.createElement('script');
-  script.src = url + '?'  + args + 'callback=processJSONPresponse'; // TODO: Build correct string for GET query.
+  script.src = url + '?'  + args + 'callback=' + callback; // TODO: Build correct string for GET query.
   script.async = true;
 
   document.getElementsByTagName('head')[0].appendChild(script);
@@ -124,7 +124,6 @@ function JSONP(url, args='') {
 var showAll     = document.getElementById('show-all'),
     showOnline  = document.getElementById('show-online'),
     showOffline  = document.getElementById('show-offline');
-
 
 // Shows all channels (both offline and online)
 showAll.addEventListener('click', function() {
@@ -161,3 +160,21 @@ showOffline.addEventListener('click', function() {
     onElems[i].style.display = 'none';
   }
 });
+
+
+// Event listener for search button.
+// First let's check whether we can search at all.
+var search = document.getElementById('search-button');
+search.addEventListener('click', function(){
+  console.log('Awesome Search Button Yeah!');
+  console.log('Doesn\'t do anything due to API limitations though.');
+  // searchURL = 'https://wind-bow.hyperdev.space/twitch-api/streams/starcraft';
+  // JSONP(searchURL, 'parseSearchResultsFromJSONP');
+
+
+});
+
+
+function parseSearchResultsFromJSONP(data) {
+  console.log(data);
+}
