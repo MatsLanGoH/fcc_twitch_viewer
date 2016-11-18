@@ -2,7 +2,7 @@
  * Main functionality here.
  **************************************************/
 // Define initial list of users.
-var twitchUsers = ["brunofin", "ESL_SC2", "freecodecamp", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
+var twitchUsers = ["brunofin", "ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
 const baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
 
 populateChannels(twitchUsers);
