@@ -1,63 +1,21 @@
 /**************************************************
- * Hardcoded stuff for testing purposes
+ * Main functionality here.
  **************************************************/
-var twitchUsers = ["brunofin", "ESL_SC2", "freecodecamp"]; // ""OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
-var userObjects = [];
-var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
-var userString = 'users/';
-// userString = 'streams/';
+// Define initial list of users.
+var twitchUsers = ["brunofin", "ESL_SC2", "freecodecamp", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
+const baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
 
 populateChannels(twitchUsers);
 
-/*
-2 Ways to do this
-1st.
-For each element, create the row first with id=username;
-Then create icon/name/description divs.
-Make first query for icon and username; attach the values to the
-corresponding divs.
-Make second query to determine channel and status;
-attach channel to div, and set class of row div to offline/online accordingly.
-
-
-
-2nd.
-Create objects for each user containing
-name, iconLocation, channel name and status.
-Make first query to get icon and username and attach the values to the
-corresponding object.
-Make second query to determine channel and status;
-attach values to corresponding object.
-Create a nested div (row > (icon > iconSrc | name > nameLink | stream > streamLink)),
-set class of row div according to state.
-
-*/
-
 function populateChannels(userList) {
-    // TODO: Clear all existing channels from DOM first?
-    // Just in case this is reused for the search function.
-    // Or SRP: have a clearChannels function handy.
     userList.forEach(function(user) {
-
-      // Create Object to contain data for each user.
-      var userObj = new Object();
-      userObj.name = user;
-      userObj.icon;
-      userObj.status = 'offline';
-      userObj.stream = 'Offline...';
-      userObjects.push(userObj);  // Add to array of users.
-
-      var data;
-      data = JSONP(baseURL + 'streams/' + user);
-
-      createViewerItem(userObj.name, userObj.icon, userObj.status, userObj.stream);
+      JSONP(baseURL + 'streams/' + user);
     });
-
 }
 
 
 /*********
-* Creates row for a stream
+* Creates a row for a stream
 *********/
 function createViewerItem(username, iconSrc, channelStatus, content) {
   var user = username || 'null',
@@ -102,56 +60,45 @@ function createViewerItem(username, iconSrc, channelStatus, content) {
 }
 
 
-/*********
-* Updates row for a stream
-*********/
-function updateViewerItem(stream, id) {
-  var stream = stream || null,
-      id = id || 'ESL_SC2';
-  var item = document.getElementById(id);
-  // TODO : This doesn't work! Race conditions?
-  item.lastChild.appendChild(document.createTextNode(stream.channel.status));
-  item.setAttribute('class', 'channel-list-item online');
-}
-
-/*********
-* Updates row for a dead stream
-*********/
-function updateDeadItem(id) {
-  var id = id || 'brunofin';
-  var item = document.getElementById(id);
-
-}
-
-
 /**************************************************
  * API Call to populate channel list
  *************************************************/
 // This function processes the response from the server
 function processJSONPresponse(data) {
-  // var responseData = data;
-  console.log('JSONP response Data: ');
-  console.log(data);
 
-  if (data.error) {
+  // This attribute is contained in a /USERS/:USER response.
+  if (data.display_name) {
+    createViewerItem(data.display_name, data.logo, 'offline', data.bio);
+    console.log(data);
+
+  // This is received after a /STREAMS response for closed accounts.
+  } else if (data.error) {
     // Grab user name with regex and manipulate its DOM
-    console.log(data.error);
     var re = /'(.*?)'/g;  // Matches the bit in quotation marks.
     var userName = re.exec(data.message)[1];
-    console.log(userName);
+    createViewerItem(userName, null, 'offline dead', 'Account has been closed.');
 
-    createViewerItem(userName, null, 'dead', 'Account has been closed.');
-
+  // This is the response for users with an active account,
+  // but who are not streaming. For them, an additional JSONP call
+  // is placed to retrieve user data.
   } else if (data.stream == null) {
-    // Don't do anything for now. We need the user icon, though. Ideas?
-    console.log('Not streaming now');
+    // Grab username from stream description.
+    var re = /\w*[^\/]$/g;
+    var userName = re.exec(data._links.channel);
+    // TODO: We still need the user icon, though. Ideas?
+    // createViewerItem(userName, null, 'offline', 'Offline...');
+    JSONP(baseURL + 'users/' + userName);
+
+  // This is the response for users with an active account,
+  // who are currently streaming something.
   } else if (data.stream) {
-    // Update the DOM for this user with Stream data.
-    createViewerItem(data.stream.channel.display_name, data.stream.channel.logo, 'online', data.stream.channel.status)
+    // User is online. Update the DOM for this user with Stream data.
+    createViewerItem(data.stream.channel.display_name, data.stream.channel.logo, 'online', data.stream.channel.status);
   }
 
   return data;
 }
+
 
 // Note: Using JSONP to override CORS (Cross Origin Resource Sharing)
 // that occurs with an XHR(ajax) request.
