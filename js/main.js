@@ -19,7 +19,7 @@ function populateChannels(userList) {
 *********/
 function createViewerItem(username, iconSrc, channelStatus, content) {
   var user = username || 'null',
-      iconSrc = iconSrc  || '/img/missing.png', // TODO please implement generic not found
+      iconSrc = iconSrc  || '/img/missing.png',
       channelStatus = channelStatus || 'offline',
       contentDescription = content || 'Offline...';
 
@@ -30,10 +30,11 @@ function createViewerItem(username, iconSrc, channelStatus, content) {
   // Create sub divs.
   var divNodes = [];
   var subDivs = ['icon', 'name', 'content'];
+
+  // Attach sub divs to row div.
   subDivs.forEach(function(el) {
     subDiv = document.createElement('div');
     subDiv.setAttribute('class', 'channel-'+el);
-    // subDiv.appendChild(document.createTextNode(el));
     divNodes.push(subDiv);
     rowDiv.appendChild(subDiv);
   })
@@ -52,7 +53,7 @@ function createViewerItem(username, iconSrc, channelStatus, content) {
   var contentInner = document.createTextNode(contentDescription);
   divNodes[2].appendChild(contentInner);
 
-  // Set class of row div.
+  // Set class for row div (online|offline|dead).
   rowDiv.setAttribute('class', 'channel-list-item ' + channelStatus);
 
   // Finally, attach row to DOM.
@@ -102,7 +103,9 @@ function processJSONPresponse(data) {
 
 // Note: Using JSONP to override CORS (Cross Origin Resource Sharing)
 // that occurs with an XHR(ajax) request.
-
+/**********************************
+ * Place a JSONP request with callback
+ ********************************/
 function JSONP(url, args='') {
   var script = document.createElement('script');
   script.src = url + '?'  + args + 'callback=processJSONPresponse'; // TODO: Build correct string for GET query.
@@ -113,106 +116,9 @@ function JSONP(url, args='') {
 }
 
 
-/* Usage:
-*
-* JSONP( 'someUrl.php?param1=value1', function(data) {
-*   //do something with data, which is the JSON object retrieved from someUrl.php
-* });
-var JSONP = (function(){
-    'use strict';
-    var counter = 0;
-
-    var memoryleakcap = function() {
-        if (this.readyState && this.readyState !== "loaded" && this.readyState !== "complete") { return; }
-
-        try {
-            this.onload = this.onreadystatechange = null;
-            this.parentNode.removeChild(this);
-        } catch(ignore) {}
-    };
-
-    return function(url, callback) {
-        var uniqueName = 'callback_json' + (++counter);
-
-        var script = document.createElement('script');
-        script.src = url + (url.toString().indexOf('?') === -1 ? '?' : '&') + 'callback=' + uniqueName;
-        script.async = true;
-
-        window[ uniqueName ] = function(data){
-            callback(data);
-            window[ uniqueName ] = null;
-            try { delete window[ uniqueName ]; } catch (ignore) {}
-        };
-
-        script.onload = script.onreadystatechange = memoryleakcap;
-
-        document.getElementsByTagName('head')[0].appendChild( script );
-
-        return uniqueName;
-    };
-}());
-
-// JSONP(baseURL, function(data){console.log(data)});
-*/
-
-
- /**************************************************
-  * Output function to add channel info to DOM
-  **************************************************/
-// TODO Remove auto-executing brackets
-// TODO Should take channel info as input, right?
-function addChannelToDom(iconLocation, channelName, streamName) {
-  // Create outer div first
-  // TODO: distinguish offline / online channels.
-  var channelStatus = streamName.length > 0 ? 'online' : 'offline';
-  var outerEl = buildElement('div', 'channel-list-item ' + channelStatus);
-
-  // Append child elements to outer div
-  var innerEl = buildElement('div', 'channel-icon');
-
-  var imgEl = buildElement('img', '', iconLocation);
-  innerEl.appendChild(imgEl);
-  outerEl.appendChild(innerEl);
-
-  var items = ['name', 'content'];
-  var args = [channelName, streamName];
-  for (var i = 0; i < items.length; i++) {
-    var innerEl = buildElement('div', 'channel-'+items[i], args[i]);
-    outerEl.appendChild(innerEl);
-  }
-
-  // Finally append outer div to DOM
-  document.getElementById('channel-list-viewer').appendChild(outerEl);
-}
-
 
 /**************************************************
- * Simple Dom Element Builder.
- **************************************************/
-// TODO: WIP.
-function buildElement(tag, className='', text='') {
-  var el = document.createElement(tag);
-
-  // Set class if given
-  if (className.length > 0) {
-    el.setAttribute('class', className);
-  }
-
-  // If this is an img, use text param as source file
-  if (tag == 'img') {
-      el.setAttribute('src', text);
-      el.setAttribute('alt', 'Icon');
-  }
-  // Otherwise attach text if given.
-  else if (text.length > 0) {
-    el.appendChild(document.createTextNode(text));
-  }
-  return el;
-}
-
-
-/**************************************************
- * Event listeners to show/hide inactive channels.
+ * Event listeners to show/hide inactive channels in DOM.
  **************************************************/
 // Set up variables
 var showAll     = document.getElementById('show-all'),
