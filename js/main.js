@@ -2,6 +2,7 @@
  * Hardcoded stuff for testing purposes
  **************************************************/
 var twitchUsers = ["brunofin", "ESL_SC2", "freecodecamp"]; // ""OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
+var userObjects = [];
 var baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
 var userString = 'users/';
 // userString = 'streams/';
@@ -38,12 +39,20 @@ function populateChannels(userList) {
     // Or SRP: have a clearChannels function handy.
     userList.forEach(function(user) {
 
-      // Make first query.
-      var data = JSONP(baseURL + 'users/' + user);
+      // Create Object to contain data for each user.
+      var userObj = new Object();
+      userObj.name = user;
+      userObj.icon;
+      userObj.status = 'offline';
+      userObj.stream = 'Offline...';
+      userObjects.push(userObj);  // Add to array of users.
 
-      // Make second query.
-      var data2 = JSONP(baseURL + 'streams/' + user);
+      var data;
+      data = JSONP(baseURL + 'streams/' + user);
+
+      createViewerItem(userObj.name, userObj.icon, userObj.status, userObj.stream);
     });
+
 }
 
 
@@ -52,8 +61,8 @@ function populateChannels(userList) {
 *********/
 function createViewerItem(username, iconSrc, channelStatus, content) {
   var user = username || 'null',
-      iconSrc  = iconSrc  || '/not/found', // TODO please implement generic not found
-      channelStatus = channelStatus ? 'online' : 'offline',
+      iconSrc = iconSrc  || '/img/missing.png', // TODO please implement generic not found
+      channelStatus = channelStatus || 'offline',
       contentDescription = content || 'Offline...';
 
   // Create row.
@@ -85,11 +94,8 @@ function createViewerItem(username, iconSrc, channelStatus, content) {
   var contentInner = document.createTextNode(contentDescription);
   divNodes[2].appendChild(contentInner);
 
-  // Make second query.
-  // Attach values to divs.
   // Set class of row div.
   rowDiv.setAttribute('class', 'channel-list-item ' + channelStatus);
-
 
   // Finally, attach row to DOM.
   document.getElementById('channel-list-viewer').appendChild(rowDiv);
@@ -124,30 +130,35 @@ function updateDeadItem(id) {
 // This function processes the response from the server
 function processJSONPresponse(data) {
   // var responseData = data;
+  console.log('JSONP response Data: ');
+  console.log(data);
 
-  // If we have a display_name create the item
-  if (data.display_name) {
-    createViewerItem(data.display_name, data.logo);
-  } else if (data.error) {
-    // console.log(data);
-    updateDeadItem();
-  } else if (data.stream == null || data.stream) {
-    console.log(data.stream);
-    updateViewerItem(data.stream);
+  if (data.error) {
+    // Grab user name with regex and manipulate its DOM
+    console.log(data.error);
+    var re = /'(.*?)'/g;  // Matches the bit in quotation marks.
+    var userName = re.exec(data.message)[1];
+    console.log(userName);
+
+    createViewerItem(userName, null, 'dead', 'Account has been closed.');
+
+  } else if (data.stream == null) {
+    // Don't do anything for now. We need the user icon, though. Ideas?
+    console.log('Not streaming now');
+  } else if (data.stream) {
+    // Update the DOM for this user with Stream data.
+    createViewerItem(data.stream.channel.display_name, data.stream.channel.logo, 'online', data.stream.channel.status)
   }
 
   return data;
-  // Add Data results to DOM
-
-  addChannelToDom(data.logo, data.name, 'null');
 }
 
 // Note: Using JSONP to override CORS (Cross Origin Resource Sharing)
 // that occurs with an XHR(ajax) request.
 
-function JSONP(url) {
+function JSONP(url, args='') {
   var script = document.createElement('script');
-  script.src = url + '?callback=processJSONPresponse'; // TODO: Build correct string for GET query.
+  script.src = url + '?'  + args + 'callback=processJSONPresponse'; // TODO: Build correct string for GET query.
   script.async = true;
 
   document.getElementsByTagName('head')[0].appendChild(script);
