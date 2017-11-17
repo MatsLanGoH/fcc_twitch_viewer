@@ -3,7 +3,7 @@
  **************************************************/
 // Define initial list of users.
 var twitchUsers = ["brunofin", "comster404", "ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"]
-const baseURL = 'https://wind-bow.hyperdev.space/twitch-api/';
+const baseURL = 'https://wind-bow.gomix.me/twitch-api/';
 
 populateChannels(twitchUsers);
 
